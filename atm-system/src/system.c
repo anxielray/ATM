@@ -5,25 +5,26 @@
 #include "header.h"
 #include <ctype.h>
 #include <time.h>
-
-
+#include "colors.h"
 
 const char *RECORDS = "./data/records.txt";
 const char *USERS = "./data/users.txt";
 const char *NOTIFICATIONS = "./data/notifications.txt";
 const char *TEMP_NOTIFICATIONS = "./data/temp_notif.txt";
 
+/*Function will check for the available accounts based on the user's name
+======================================================================================*/
 int* AvailableAccounts(struct User *u, struct Record *r, int *accessibleAccounts) {
     FILE *pf = fopen(RECORDS, "r");
     if (pf == NULL) {
-        perror("Error opening RECORDS file");
+        perror(RED"Error opening RECORDS file"RESET);
         return NULL;
     }
 
     char buffer[256];
     int current_size = 0;
 
-    printf("\n\n\t\t====== Available Accounts ======\n\n");
+    printf(BG_WHITE BYELLOW"\n\n\t\t====== Available Accounts ======\n\n"RESET);
 
     while (fgets(buffer, sizeof(buffer), pf) != NULL) {
         int accountNbr, recordUserId, usersID;
@@ -37,19 +38,19 @@ int* AvailableAccounts(struct User *u, struct Record *r, int *accessibleAccounts
                 if (current_size < 10) {
                     accessibleAccounts[current_size] = accountNbr;
 
-                    printf("\n\t=== Account #%d Details ===\n", accountNbr);
-                    printf("\tAccount Number: %d\n", accountNbr);
+                    printf(BG_YELLOW BLUE"\n\t=== Account #%d Details ===\n", accountNbr);
+                    printf(BLUE"\tAccount Number: %d\n", accountNbr);
                     printf("\tAccount Holder: %s\n", name);
                     printf("\tAccount Type: %s\n", accountType);
                     printf("\tAccount Creation Date: %s\n", date);
                     printf("\tCountry: %s\n", country);
                     printf("\tPhone Number: %s\n", phone);
                     printf("\tCurrent Balance: $%.2f\n", amount);
-                    printf("\t===========================\n");
+                    printf(BG_YELLOW BLUE"\t===========================\n"RESET);
 
                     current_size++;
                 } else {
-                    printf("\n\t\t✖ Maximum number of accounts reached.\n");
+                    printf(RED"\n\t\t✖ Maximum number of accounts reached.\n"RESET);
                     break;
                 }
             }
@@ -59,9 +60,9 @@ int* AvailableAccounts(struct User *u, struct Record *r, int *accessibleAccounts
     fclose(pf);
 
     if (current_size == 0) {
-        printf("\n\t\t✖ No accounts found for user %s.\n", u->name);
-        printf("\n\n\t\t[1] Return to main menu\t\t[2] Exit\n");
-        printf("\n\t\tEnter your choice: ");
+        printf(RED"\n\t\t✖ No accounts found for user %s.\n", u->name);
+        printf(RESET"\n\n\t\t[1] Return to main menu\t\t[2] Exit\n");
+        printf(BG_YELLOW BLUE"\n\t\tEnter your choice: "RESET);
         
         int choice;
         scanf("%d", &choice);
@@ -79,39 +80,6 @@ int* AvailableAccounts(struct User *u, struct Record *r, int *accessibleAccounts
     return accessibleAccounts;
 }
 
-
-/* Helper function to save account details to the file
-=============================================================================*/
-void saveAccountToFile(FILE *ptr, struct User u, struct Record r)
-{
-    fprintf(ptr, "%d %d %s, %d %s %s %s %lf %s\n",
-            r.accountNbr,
-            r.userId,
-            u.name,
-            u.id,
-            r.date,
-            r.country,
-            r.phone,
-            r.amount,
-            r.accountType);
-}
-
-/* Helper function to retrieve an account from the records file
-================================================================================================*/
-int getAccountFromFile(FILE *ptr, char name[MAX_NAME_LENGTH], struct Record *r)
-{
-    return fscanf(ptr, "%d %d %49s %d %9s %s %s %lf %s",
-                  &r->accountNbr,
-                  &r->id,
-                  r->name,
-                  &r->userId,
-                  r->date,
-                  r->country,
-                  r->phone,
-                  &r->amount,
-                  r->accountType) != EOF;
-}
-
 /* Update account information: (country or phone number)
 ===================================================================================*/
 void updateAccountInfo(struct User u)
@@ -122,18 +90,18 @@ void updateAccountInfo(struct User u)
     struct Record records[100];
 
     system("clear");
-    printf("\n\n\t\t====== Update Account Information ======\n");
-    printf("\nYour available accounts:\n");
+    printf(BG_YELLOW BLUE"\n\n\t\t====== Update Account Information ======\n");
+    printf("\nYour available accounts:\n"RESET);
     AvailableAccounts(&u, &r, arr);
     
-    printf("\n\nPlease enter the account number you wish to update: ");
+    printf(BG_YELLOW BLUE"\n\nPlease enter the account number you wish to update: "RESET);
     scanf("%d", &accountNumber);
 
     int count = 0;
     FILE *pf = fopen(RECORDS, "r");
     if (pf == NULL)
     {
-        fprintf(stderr, "\n\t\t✖ Error opening records file.\n");
+        fprintf(stderr, RED"\n\t\t✖ Error opening records file.\n"RESET);
         return;
     }
 
@@ -149,25 +117,24 @@ void updateAccountInfo(struct User u)
     int found = 0;
     for (int i = 0; i < count; i++)
     {
-        printf("Hello: %d\n", i);
         if ((records[i].accountNbr == accountNumber)&& strcmp(u.name, records[i].name) == 0)
         {
             found = 1;
             system("clear");
-            printf("\n\t\t====== Current Account Details ======\n");
-            printf("\n\t\tAccount Number: %d", records[i].accountNbr);
-            printf("\n\t\tName: %s", records[i].name);
-            printf("\n\t\tCountry: %s", records[i].country);
-            printf("\n\t\tPhone: %s", records[i].phone);
-            printf("\n\t\tAccount Type: %s", records[i].accountType);
-            printf("\n\t\tBalance: $%.2f", records[i].amount);
-            printf("\n\t\tCreation Date: %s", records[i].date);
+            printf(BG_YELLOW BLUE"\n\t\t====== Current Account Details ======\n");
+            printf(BBLUE"\n\t\tAccount Number: %d"YELLOW, records[i].accountNbr);
+            printf(BBLUE"\n\t\tName: %s"YELLOW, records[i].name);
+            printf(BBLUE"\n\t\tCountry: %s"YELLOW, records[i].country);
+            printf(BBLUE"\n\t\tPhone: %s"YELLOW, records[i].phone);
+            printf(BBLUE"\n\t\tAccount Type: %s"YELLOW, records[i].accountType);
+            printf(BBLUE"\n\t\tBalance: $%.2f"YELLOW, records[i].amount);
+            printf(BBLUE"\n\t\tCreation Date: %s"YELLOW, records[i].date);
 
             double interestRate = 0.0;
             int tenureYears = 0;
             if (strcmp(records[i].accountType, "savings") == 0) {
                 interestRate = 0.07;
-                tenureYears = 1; // For calculation purposes
+                tenureYears = 1; 
             } else if (strcmp(records[i].accountType, "fixed01") == 0) {
                 interestRate = 0.04;
                 tenureYears = 1;
@@ -186,26 +153,26 @@ void updateAccountInfo(struct User u)
                     char day[3];
                     strncpy(day, records[i].date, 2);
                     day[2] = '\0';
-                    printf("\n\n\t\tYou will get $%.2f as interest on day %s of every month", monthlyInterest, day);
+                    printf(BG_WHITE BLUE"\n\n\t\tYou will get $%.2f as interest on day %s of every month", monthlyInterest, day);
                 } else {
                     int day, month, year;
                     sscanf(records[i].date, "%d/%d/%d", &day, &month, &year);
                     year += tenureYears;
-                    printf("\n\n\t\tYou will get $%.2f as interest on %02d/%02d/%04d", interest, day, month, year);
+                    printf(BG_WHITE BLUE"\n\n\t\tYou will get $%.2f as interest on %02d/%02d/%04d"RESET, interest, day, month, year);
                 }
             } else if (strcmp(records[i].accountType, "current") == 0) {
-                printf("\n\n\t\tYou will not get interests because the account is of type current");
+                printf(BG_WHITE BLUE"\n\n\t\tYou will not get interests because the account is of type current");
             } else {
-                printf("\n\n\t\tUnknown account type. Interest information not available.");
+                printf(RED"\n\n\t\tUnknown account type. Interest information not available."RESET);
             }
             
-            printf("\n\t\tWhat would you like to update?\n");
-            printf("\n\t\t[1] Country");
-            printf("\n\t\t[2] Phone Number");
-            printf("\n\t\t[3] Both");
-            printf("\n\t\t[4] Cancel\n");
-            printf("\n\t\t[5] Exit\n");
-            printf("\n\t\tEnter your choice (1-4): ");
+            printf(BG_YELLOW BLUE"\n\t\tWhat would you like to update?\n"RESET);
+            printf(BBLUE"\n\t\t[1] Country");
+            printf(BBLUE"\n\t\t[2] Phone Number");
+            printf(BBLUE"\n\t\t[3] Both");
+            printf(BBLUE"\n\t\t[4] Cancel\n");
+            printf(BBLUE"\n\t\t[5] Exit\n");
+            printf(BBLUE"\n\t\tEnter your choice (1-4): "RESET);
             
             int choice;
             scanf("%d", &choice);
@@ -214,33 +181,33 @@ void updateAccountInfo(struct User u)
             char newCountry[30], newPhone[15];
             switch(choice) {
                 case 1:
-                    printf("\n\t\tEnter new country: ");
+                    printf(BG_YELLOW BLUE"\n\t\tEnter new country: "RESET);
                     fgets(newCountry, sizeof(newCountry), stdin);
                     newCountry[strcspn(newCountry, "\n")] = 0;
                     strncpy(records[i].country, newCountry, sizeof(records[i].country) - 1);
                     break;
                     
                 case 2:
-                    printf("\n\t\tEnter new phone number: ");
+                    printf(BG_YELLOW BLUE"\n\t\tEnter new phone number: "RESET);
                     fgets(newPhone, sizeof(newPhone), stdin);
                     newPhone[strcspn(newPhone, "\n")] = 0;
                     strncpy(records[i].phone, newPhone, sizeof(records[i].phone) - 1);
                     break;
                     
                 case 3:
-                    printf("\n\t\tEnter new country: ");
+                    printf(BG_YELLOW BLUE"\n\t\tEnter new country: "RESET);
                     fgets(newCountry, sizeof(newCountry), stdin);
                     newCountry[strcspn(newCountry, "\n")] = 0;
                     strncpy(records[i].country, newCountry, sizeof(records[i].country) - 1);
                     
-                    printf("\t\tEnter new phone number: ");
+                    printf(BG_YELLOW BLUE"\t\tEnter new phone number: "RESET);
                     fgets(newPhone, sizeof(newPhone), stdin);
                     newPhone[strcspn(newPhone, "\n")] = 0;
                     strncpy(records[i].phone, newPhone, sizeof(records[i].phone) - 1);
                     break;
                     
                 case 4:
-                    printf("\n\t\t✖ Update cancelled.\n");
+                    printf(BG_YELLOW BLUE"\n\t\t✖ Update cancelled.\n"RESET);
                     updateAccountInfo(u);
                     break;
                     
@@ -249,7 +216,7 @@ void updateAccountInfo(struct User u)
                     break;
                 
                 default:
-                    printf("\n\t\t✖ Invalid choice.\n");
+                    printf(RED"\n\t\t✖ Invalid choice.\n"RESET);
                     updateAccountInfo(u);
                     break;
             }
@@ -261,9 +228,9 @@ void updateAccountInfo(struct User u)
 
     if (!found)
     {
-        printf("\n\t\t✖ Account number %d not found or does not belong to you.\n", accountNumber);
+        printf(RED"\n\t\t✖ Account number %d not found or does not belong to you.\n"RESET, accountNumber);
         printf("\n\n\t\t[1] Return to main menu\t\t[2] Exit\n");
-        printf("\n\t\tEnter your choice: ");
+        printf(BG_YELLOW BLUE"\n\t\tEnter your choice: "RESET);
         
         int choice;
         scanf("%d", &choice);
@@ -281,7 +248,7 @@ void updateAccountInfo(struct User u)
     pf = fopen(RECORDS, "w");
     if (pf == NULL)
     {
-        fprintf(stderr, "\n\t\t✖ Error opening records file for writing.\n");
+        fprintf(stderr, RED"\n\t\t✖ Error opening records file for writing.\n"RESET);
         return;
     }
 
@@ -303,10 +270,10 @@ void updateAccountInfo(struct User u)
     fclose(pf);
 
     system("clear");
-    printf("\n\n\t\t✔ Account information updated successfully!\n");
+    printf(BG_WHITE BGREEN"\n\n\t\t✔ Account information updated successfully!\n"RESET);
     printf("\n\t\t[1] Return to main menu");
     printf("\n\t\t[2] Exit\n");
-    printf("\n\t\tEnter your choice (1-2): ");
+    printf(BG_YELLOW BLUE"\n\t\tEnter your choice (1-2): "RESET);
     
     int returnChoice;
     scanf("%d", &returnChoice);
@@ -317,25 +284,26 @@ void updateAccountInfo(struct User u)
     }
     else
     {
-        printf("\n\t\tThank you for using our services, %s!\n\n", u.name);
+        printf(BG_WHITE BCYAN"\n\t\tThank you for using our services, %s!\n\n"RESET, u.name);
         exit(0);
     }
 }
 
 
-// =========function to check user accounts =======
+/*function to check user accounts
+==================================================================================*/
 void checkAccountDetails(struct User u)
 {
     struct Record r;
     int found = 0;
     
     system("clear");
-    printf("\n\n\t\t====== Detailed Account Information ======\n\n");
+    printf(BG_YELLOW BLUE"\n\n\t\t====== Detailed Account Information ======\n\n"RESET);
 
     FILE *pf = fopen(RECORDS, "r");
     if (pf == NULL)
     {
-        fprintf(stderr, "\n\t\t✖ Error opening records file!\n");
+        fprintf(stderr, RED"\n\t\t✖ Error opening records file!\n"RESET);
         return;
     }
 
@@ -351,15 +319,15 @@ void checkAccountDetails(struct User u)
         
         if (result == 9 && strcmp(r.name, u.name) == 0)
         {
-            printf("\n\t=== Account #%d Details ===\n", r.accountNbr);
-            printf("\tAccount Number: %d\n", r.accountNbr);
-            printf("\tAccount Holder: %s\n", r.name);
-            printf("\tAccount Type: %s\n", r.accountType);
-            printf("\tAccount Creation Date: %s\n", r.date);
-            printf("\tCountry: %s\n", r.country);
-            printf("\tPhone Number: %s\n", r.phone);
-            printf("\tCurrent Balance: $%.2f\n", r.amount);
-            printf("\t===========================\n\n");
+            printf(BG_YELLOW BLUE"\n\t=== Account #%d Details ===\n"RESET, r.accountNbr);
+            printf(BBLUE"\tAccount Number: %d\n"YELLOW, r.accountNbr);
+            printf(BBLUE"\tAccount Holder: %s\n"YELLOW, r.name);
+            printf(BBLUE"\tAccount Type: %s\n"YELLOW, r.accountType);
+            printf(BBLUE"\tAccount Creation Date: %s\n"YELLOW, r.date);
+            printf(BBLUE"\tCountry: %s\n"YELLOW, r.country);
+            printf(BBLUE"\tPhone Number: %s\n"YELLOW, r.phone);
+            printf(BBLUE"\tCurrent Balance: $%.2f\n"YELLOW, r.amount);
+            printf(BBLUE"\t===========================\n\n"RESET);
             found = 1;
         }
     }
@@ -368,9 +336,9 @@ void checkAccountDetails(struct User u)
 
     if (!found)
     {
-        printf("\n\t\t✖ No accounts found for user %s.\n", u.name);
+        printf(RED"\n\t\t✖ No accounts found for user %s.\n"RESET, u.name);
         printf("\n\n\t\t[1] Return to main menu\t\t[2] Exit\n");
-        printf("\n\t\tEnter your choice: ");
+        printf(BG_YELLOW BLUE"\n\t\tEnter your choice: "RESET);
         
         int choice;
         scanf("%d", &choice);
@@ -386,7 +354,7 @@ void checkAccountDetails(struct User u)
     }
 
     printf("\n\n\t\t[1] Return to main menu\t\t[2] Exit\n");
-    printf("\n\t\tEnter your choice: ");
+    printf(BG_YELLOW BLUE"\n\t\tEnter your choice: "RESET);
     
     int choice;
     scanf("%d", &choice);
@@ -411,18 +379,18 @@ void makeTransaction(struct User u)
     double amount;
 
     system("clear");
-    printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+    printf(BG_YELLOW BLUE"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
     printf("\n\t\t║                   Make Transaction                       ║");
-    printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n\n");
+    printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n\n"RESET);
 
     fp = fopen(RECORDS, "r+");
     if (fp == NULL)
     {
-        printf("\n\t\t✖ Error opening records file.\n");
+        printf(RED"\n\t\t✖ Error opening records file.\n"RESET);
         exit(1);
     }
 
-    printf("\n\t\tEnter your account number: ");
+    printf(BG_YELLOW BLUE"\n\t\tEnter your account number: "RESET);
     scanf("%d", &accountNumber);
 
     char line[256];
@@ -437,19 +405,19 @@ void makeTransaction(struct User u)
                     record.date, record.country, record.phone, &record.amount,
                     record.accountType);
         
-        if (result == 9 && record.accountNbr == accountNumber && strcmp(record.name, u.name) == 0 || record.accountType == "current" || record.accountType == "savings")
+        if (result == 9 && record.accountNbr == accountNumber && strcmp(record.name, u.name) == 0 || strcmp(record.accountType, "current") == 0 || strcmp(record.accountType, "savings") == 0)
         {
             found = 1;
             break;
         }
         else if (record.accountType != "current" && record.accountType != "savings" && record.accountType != "account")
         {
-            printf("\n\t\t✖ Transactions are not allowed on fixed type of accounts.\n");
+            printf(RED"\n\t\t✖ Transactions are not allowed on fixed type of accounts.\n"RESET);
             fclose(fp);
-            printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+            printf(BG_YELLOW BLUE"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
             printf("\n\t\t║  [1] Return to main menu          [2] Exit               ║");
             printf("\n\t\t╚══════════════════════════════════════════════════════════╝");
-            printf("\n\n\t\tEnter your choice: ");
+            printf("\n\n\t\tEnter your choice: "RESET);
             
             int choice;
             scanf("%d", &choice);
@@ -462,13 +430,13 @@ void makeTransaction(struct User u)
 
     if (!found)
     {
-        printf("\n\t\t✖ Account not found or does not belong to you.\n");
+        printf(RED"\n\t\t✖ Account not found or does not belong to you.\n"RESET);
         fclose(fp);
         
-        printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+        printf(BG_YELLOW BLUE"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
         printf("\n\t\t║  [1] Return to main menu          [2] Exit               ║");
         printf("\n\t\t╚══════════════════════════════════════════════════════════╝");
-        printf("\n\n\t\tEnter your choice: ");
+        printf("\n\n\t\tEnter your choice: "RESET);
         
         int choice;
         scanf("%d", &choice);
@@ -478,59 +446,59 @@ void makeTransaction(struct User u)
     }
 
     system("clear");
-    printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+    printf(BG_YELLOW BLUE"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
     printf("\n\t\t║                   Account Details                        ║");
-    printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n");
-    printf("\n\t\tAccount Number: %d", record.accountNbr);
-    printf("\n\t\tAccount Holder: %s", record.name);
-    printf("\n\t\tCurrent Balance: $%.2f\n", record.amount);
+    printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n"RESET);
+    printf(BBLUE"\n\t\tAccount Number: %d"YELLOW, record.accountNbr);
+    printf(BBLUE"\n\t\tAccount Holder: %s"YELLOW, record.name);
+    printf(BBLUE"\n\t\tCurrent Balance: $%.2f\n"RESET, record.amount);
 
-    printf("\n\t\tChoose transaction type:\n");
-    printf("\n\t\t[1] Deposit");
-    printf("\n\t\t[2] Withdraw\n");
-    printf("\n\t\t[3] Cancel\n");
-    printf("\n\t\t[4] Exit\n");
-    printf("\n\t\tEnter your choice: ");
+    printf(BG_YELLOW BLUE"\n\t\tChoose transaction type:\n"RESET);
+    printf(BBLUE"\n\t\t[1] Deposit");
+    printf(BBLUE"\n\t\t[2] Withdraw\n");
+    printf(BWHITE"\n\t\t[3] Cancel\n");
+    printf(BRED"\n\t\t[4] Exit\n");
+    printf(BG_YELLOW BLUE"\n\t\tEnter your choice: "RESET);
     scanf("%d", &transactionType);
 
     if (transactionType == 1)
     {
-        printf("\n\t\tEnter amount to deposit: $");
+        printf(BG_YELLOW BLUE"\n\t\tEnter amount to deposit: $"RESET);
         scanf("%lf", &amount);
         record.amount += amount;
         system("clear");
-        printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+        printf(BG_YELLOW BLUE"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
         printf("\n\t\t║                   Transaction Complete                   ║");
-        printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n");
-        printf("\n\t\t✔ Deposited: $%.2f", amount);
-        printf("\n\t\t✔ New balance: $%.2f\n", record.amount);
+        printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n"RESET);
+        printf(BG_WHITE BGREEN"\n\t\t✔ Deposited: $%.2f"YELLOW, amount);
+        printf(BG_WHITE BGREEN"\n\t\t✔ New balance: $%.2f\n"RESET, record.amount);
     }
     else if (transactionType == 2)
     {
-        printf("\n\t\tEnter amount to withdraw: $");
+        printf(BG_YELLOW BLUE"\n\t\tEnter amount to withdraw: $"RESET);
         scanf("%lf", &amount);
         if (amount <= record.amount)
         {
             record.amount -= amount;
             system("clear");
-            printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+            printf(BG_YELLOW BLUE"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
             printf("\n\t\t║                   Transaction Complete                   ║");
-            printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n");
-            printf("\n\t\t✔ Withdrew: $%.2f", amount);
-            printf("\n\t\t✔ New balance: $%.2f\n", record.amount);
+            printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n"RESET);
+            printf(BG_WHITE BGREEN"\n\t\t✔ Withdrew: $%.2f"YELLOW, amount);
+            printf(BG_WHITE BGREEN"\n\t\t✔ New balance: $%.2f\n"RESET, record.amount);
         }
         else
         {
-            printf("\n\t\t✖ Insufficient balance for withdrawal.\n");
+            printf(RED"\n\t\t✖ Insufficient balance for withdrawal.\n"RESET);
         }
     }
     else if (transactionType == 3)
     {
         system("clear");
-        printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+        printf(BG_YELLOW BLUE"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
         printf("\n\t\t║                   Transaction Cancelled                   ║");
-        printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n");
-        printf("\n\t\tTransaction cancelled.\n");
+        printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n"RESET);
+        printf(YELLOW"\n\t\tTransaction cancelled.\n"RESET);
         makeTransaction(u);
     }
     else if (transactionType == 4)
@@ -539,7 +507,7 @@ void makeTransaction(struct User u)
     }
     else
     {
-        printf("\n\t\t✖ Invalid choice.\n");
+        printf(RED"\n\t\t✖ Invalid choice.\n"RESET);
         fclose(fp);
         return;
     }
@@ -566,10 +534,10 @@ void makeTransaction(struct User u)
 
     fclose(fp);
 
-    printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+    printf(BG_YELLOW BLUE"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
     printf("\n\t\t║  [1] Return to main menu          [2] Exit               ║");
     printf("\n\t\t╚══════════════════════════════════════════════════════════╝");
-    printf("\n\n\t\tEnter your choice: ");
+    printf("\n\n\t\tEnter your choice: "RESET);
     
     int choice;
     scanf("%d", &choice);
@@ -580,7 +548,7 @@ void makeTransaction(struct User u)
     }
     else
     {
-        printf("\n\t\tThank you for using our services, %s!\n\n", u.name);
+        printf(BG_WHITE BCYAN"\n\t\tThank you for using our services, %s!\n\n", u.name);
         exit(0);
     }
 }
@@ -595,26 +563,26 @@ void removeAccount(struct User u)
     int found = 0;
 
     system("clear");
-    printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+    printf(BG_YELLOW BLUE"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
     printf("\n\t\t║                   Remove Account                         ║");
-    printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n\n");
+    printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n\n"RESET);
 
     fp = fopen(RECORDS, "r");
     if (fp == NULL)
     {
-        printf("\n\t\t✖ Error opening records file.\n");
+        printf(RED"\n\t\t✖ Error opening records file.\n"RESET);
         exit(1);
     }
 
-    tempFile = fopen("temp.txt", "w");
+    tempFile = fopen("data/temp.txt", "w");
     if (tempFile == NULL)
     {
-        printf("\n\t\t✖ Error creating temporary file.\n");
+        printf(RED"\n\t\t✖ Error creating temporary file.\n"RESET);
         fclose(fp);
         exit(1);
     }
 
-    printf("\n\t\tEnter the account number to remove: ");
+    printf(BG_YELLOW BLUE"\n\t\tEnter the account number to remove: "RESET);
     scanf("%d", &accountNumber);
 
     char line[256];
@@ -648,26 +616,26 @@ void removeAccount(struct User u)
         if (remove(RECORDS) == 0 && rename("temp.txt", RECORDS) == 0)
         {
             system("clear");
-            printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+            printf(BG_YELLOW BLUE"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
             printf("\n\t\t║                   Account Removed                        ║");
-            printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n");
-            printf("\n\t\t✔ Account %d has been successfully removed.\n", accountNumber);
+            printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n"RESET);
+            printf(BG_WHITE BGREEN"\n\t\t✔ Account %d has been successfully removed.\n", accountNumber);
         }
         else
         {
-            printf("\n\t\t✖ Error updating records file.\n");
+            printf(RED"\n\t\t✖ Error updating records file.\n"RESET);
         }
     }
     else
     {
-        remove("temp.txt");
-        printf("\n\t\t✖ Account not found or does not belong to you.\n");
+        remove("data/temp.txt");
+        printf(RED"\n\t\t✖ Account not found or does not belong to you.\n"RESET);
     }
 
-    printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+    printf(BG_YELLOW BLUE"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
     printf("\n\t\t║  [1] Return to main menu          [2] Exit               ║");
     printf("\n\t\t╚══════════════════════════════════════════════════════════╝");
-    printf("\n\n\t\tEnter your choice: ");
+    printf("\n\n\t\tEnter your choice: "RESET);
     
     int choice;
     scanf("%d", &choice);
@@ -678,7 +646,7 @@ void removeAccount(struct User u)
     }
     else
     {
-        printf("\n\t\tThank you for using our services, %s!\n\n", u.name);
+        printf(BG_WHITE BCYAN"\n\t\tThank you for using our services, %s!\n\n"RESET, u.name);
         exit(0);
     }
 }
@@ -696,25 +664,25 @@ void transferAccountOwnership(struct User u)
     int found = 0;
 
     system("clear");
-    printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+    printf(BG_YELLOW BLUE"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
     printf("\n\t\t║                Transfer Account Ownership                ║");
-    printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n\n");
+    printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n\n"RESET);
 
     fp = fopen(RECORDS, "r");
-    tempFile = fopen("temp.txt", "w");
+    tempFile = fopen("data/temp.txt", "w");
     userFile = fopen(USERS, "r");
 
     if (fp == NULL || tempFile == NULL || userFile == NULL) {
-        printf("\n\t\t✖ Error accessing files.\n");
+        printf(RED"\n\t\t✖ Error accessing files.\n"RESET);
         if (fp) fclose(fp);
         if (tempFile) fclose(tempFile);
         if (userFile) fclose(userFile);
         return;
     }
 
-    printf("\n\t\tYour accounts:\n");
+    printf(BG_YELLOW BLUE"\n\t\tYour accounts:\n");
     printf("\n\t\t%-10s %-15s %-10s\n", "Account #", "Type", "Balance");
-    printf("\t\t----------------------------------------\n");
+    printf("\t\t----------------------------------------\n"RESET);
     
     char line[256];
     while (fgets(line, sizeof(line), fp)) {
@@ -733,7 +701,7 @@ void transferAccountOwnership(struct User u)
         }
     }
 
-    printf("\n\t\tEnter the account number to transfer: ");
+    printf(BG_YELLOW BLUE"\n\t\tEnter the account number to transfer: "RESET);
     scanf("%d", &accountNumber);
     getchar();
 
@@ -750,16 +718,16 @@ void transferAccountOwnership(struct User u)
             if (record.accountNbr == accountNumber) {
                 if (strcmp(record.name, u.name) != 0) {
                     system("clear");
-                    printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+                    printf(BG_YELLOW RED"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
                     printf("\n\t\t║                      WARNING                             ║");
-                    printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n");
-                    printf("\n\t\t✖ This account (#%d) doesn't belong to you!\n", accountNumber);
+                    printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n"RESET);
+                    printf(RED"\n\t\t✖ This account (#%d) doesn't belong to you!\n"RESET, accountNumber);
                     printf("\n\t\tPress Enter to continue...");
                     getchar();
                     fclose(fp);
                     fclose(tempFile);
                     fclose(userFile);
-                    remove("temp.txt");
+                    remove("data/temp.txt");
                     mainMenu(u);
                     return;
                 }
@@ -771,18 +739,18 @@ void transferAccountOwnership(struct User u)
 
     if (!found) {
         system("clear");
-        printf("\n\t\t✖ Account not found!\n");
+        printf(RED"\n\t\t✖ Account not found!\n"RESET);
         fclose(fp);
         fclose(tempFile);
         fclose(userFile);
-        remove("temp.txt");
+        remove("data/temp.txt");
         printf("\n\t\tPress Enter to continue...");
         getchar();
         mainMenu(u);
         return;
     }
 
-    printf("\n\t\tEnter the new owner's username: ");
+    printf(BG_YELLOW BLUE"\n\t\tEnter the new owner's username: "RESET);
     scanf("%49s", newOwner.name);
     getchar();
     
@@ -802,15 +770,15 @@ void transferAccountOwnership(struct User u)
 
     if (!newOwnerFound) {
         system("clear");
-        printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+        printf(BG_YELLOW RED"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
         printf("\n\t\t║                      WARNING                             ║");
-        printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n");
-        printf("\n\t\t✖ User '%s' is not registered in the system!\n", newOwner.name);
-        printf("\n\t\t✖ Transfer can only be made to registered users.\n");
+        printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n"RESET);
+        printf(RED"\n\t\t✖ User '%s' is not registered in the system!\n", newOwner.name);
+        printf("\n\t\t✖ Transfer can only be made to registered users.\n"RESET);
         fclose(fp);
         fclose(tempFile);
         fclose(userFile);
-        remove("temp.txt");
+        remove("data/temp.txt");
         
         printf("\n\n\t\tPress Enter to continue...");
         getchar();
@@ -818,7 +786,7 @@ void transferAccountOwnership(struct User u)
         return;
     }
 
-    printf("\n\t\tPlease ask %s to enter their password to confirm the transfer: ", newOwner.name);
+    printf(BG_YELLOW BLUE"\n\t\tPlease ask %s to enter their password to confirm the transfer: "BLACK, newOwner.name);
     scanf("%49s", inputPassword);
     getchar();
 
@@ -826,15 +794,15 @@ void transferAccountOwnership(struct User u)
 
     if (strcmp(hashedInputPassword, existingUser.password) != 0) {
         system("clear");
-        printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+        printf(BG_YELLOW RED"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
         printf("\n\t\t║                      WARNING                             ║");
-        printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n");
-        printf("\n\t\t✖ Incorrect password! Transfer cancelled.\n");
-        printf("\n\t\t✖ The new owner must consent to the transfer.\n");
+        printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n"RESET);
+        printf(RED"\n\t\t✖ Incorrect password! Transfer cancelled.\n");
+        printf("\n\t\t✖ The new owner must consent to the transfer.\n"RESET);
         fclose(fp);
         fclose(tempFile);
         fclose(userFile);
-        remove("temp.txt");
+        remove("data/temp.txt");
         
         printf("\n\n\t\tPress Enter to continue...");
         getchar();
@@ -843,7 +811,7 @@ void transferAccountOwnership(struct User u)
     }
 
     rewind(fp);
-    tempFile = freopen("temp.txt", "w", tempFile);
+    tempFile = freopen("data/temp.txt", "w", tempFile);
     while (fgets(line, sizeof(line), fp)) {
         if (line[0] == '\n') {
             fprintf(tempFile, "\n");
@@ -879,10 +847,10 @@ void transferAccountOwnership(struct User u)
 
     if (remove(RECORDS) == 0 && rename("temp.txt", RECORDS) == 0) {
         system("clear");
-        printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+        printf(BG_YELLOW BLUE"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
         printf("\n\t\t║              Transfer Completed Successfully             ║");
-        printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n");
-        printf("\n\t\t✔ Account #%d has been transferred to %s.\n", accountNumber, newOwner.name);
+        printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n"RESET);
+        printf(BG_WHITE BGREEN"\n\t\t✔ Account #%d has been transferred to %s.\n"RESET, accountNumber, newOwner.name);
         
         time_t now = time(NULL);                    
         struct tm *t = localtime(&now);             
@@ -892,20 +860,20 @@ void transferAccountOwnership(struct User u)
 
         FILE *notifFile = fopen(NOTIFICATIONS, "a");
         if (notifFile) {
-            fprintf(notifFile, "[%s] %s: You have received account #%d from %s.\n",
+            fprintf(notifFile, BG_WHITE BCYAN"[%s] %s: You have received account #%d from %s.\n"RESET,
                     timestamp, newOwner.name, accountNumber, u.name);
             fclose(notifFile);
         }
 
 
     } else {
-        printf("\n\t\t✖ Error updating records.\n");
+        printf(RED"\n\t\t✖ Error updating records.\n"RESET);
     }
 
-    printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+    printf(BG_YELLOW BLUE"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
     printf("\n\t\t║  [1] Return to main menu          [2] Exit               ║");
     printf("\n\t\t╚══════════════════════════════════════════════════════════╝");
-    printf("\n\n\t\tEnter your choice: ");
+    printf("\n\n\t\tEnter your choice: "RESET);
     
     int choice;
     scanf("%d", &choice);
@@ -913,7 +881,7 @@ void transferAccountOwnership(struct User u)
     if (choice == 1) {
         mainMenu(u);
     } else {
-        printf("\n\t\tThank you for using our services, %s!\n\n", u.name);
+        printf(BG_WHITE BCYAN"\n\t\tThank you for using our services, %s!\n\n"RESET, u.name);
         exit(0);
     }
 }
@@ -929,7 +897,7 @@ int countLinesInFile()
     fp = fopen(USERS, "r");
     if (fp == NULL)
     {
-        perror("Error opening file");
+        perror(RED"Error opening file"RESET);
         return -1;
     }
 
@@ -966,74 +934,8 @@ int isValidUsername(const char *username)
     return 1;
 }
 
-/* Function to handle the registration of a new user
-============================================================================*/
-int registerMenu()
-{
-    struct User newUser;
-
-    FILE *userFile = fopen(USERS, "a+");
-    if (userFile == NULL)
-    {
-        fprintf(stderr, "Error opening users file.\n");
-        return 0;
-    }
-
-    while (1)
-    {
-        printf("\n\t\tEnter your username (One Name, alphanumeric): ");
-        scanf("%49s", newUser.name);
-
-        if (!isValidUsername(newUser.name))
-        {
-            printf("\n\t\t\t\tInvalid username. Only alphanumeric characters are allowed.\n");
-            continue;
-        }
-
-        struct User existingUser;
-        int usernameTaken = 0;
-
-        rewind(userFile);
-        while (fscanf(userFile, "%d %49s %64s", &existingUser.id, existingUser.name, existingUser.password) == 3)
-        {
-            if (strcmp(existingUser.name, newUser.name) == 0)
-            {
-                printf("\n\t\t✖ Username already exists! Please choose a different name.\n\n");
-                usernameTaken = 1;
-                break;
-            }
-        }
-
-        if (usernameTaken)
-        {
-            continue;
-        }
-
-        printf("\n\t\tEnter your password: ");
-        scanf("%64s", newUser.password);
-
-        char hashedPassword[65];
-        hashPassword(newUser.password, hashedPassword);
-
-        int usersCount = countLinesInFile();
-        if (usersCount < 0)
-        {
-            fprintf(stderr, "Error counting users.\n");
-            fclose(userFile);
-            return 0;
-        }
-        const char *filename = USERS;
-        newUser.id = getNextAccountNumber(filename) ;
-        fprintf(userFile, "%d %s %s\n", newUser.id, newUser.name, hashedPassword);
-        fclose(userFile);
-
-        mainMenu(newUser);
-        break;
-    }
-
-    return 1;
-}
-
+/*Function fetches the user ID based on the username
+=================================================================================*/
 int getUserIdByName(struct User u)
 {
     FILE *file;
@@ -1045,7 +947,7 @@ int getUserIdByName(struct User u)
     file = fopen(USERS, "r");
     if (file == NULL)
     {
-        perror("\n\n\t\t\t\tError: Unable to open file\n");
+        perror(RED"\n\n\t\t\t\tError: Unable to open file\n"RESET);
         return -1;
     }
 
@@ -1066,27 +968,27 @@ int getUserIdByName(struct User u)
 
 /*
 Function to retrieve account numbers that a particular user in the u.name should be able to access
-======================================================================================*/
+===================================================================================================*/
 void checkAllAccounts(struct User u)
 {
     struct Record r;
     int found = 0;
     
     system("clear");
-    printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+    printf(BG_YELLOW BLUE"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
     printf("\n\t\t║              All Account Information                     ║");
-    printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n\n");
+    printf("\n\t\t╚══════════════════════════════════════════════════════════╝\n\n"RESET);
 
     FILE *pf = fopen(RECORDS, "r");
     if (pf == NULL)
     {
-        fprintf(stderr, "\n\t\t✖ Error opening records file!\n");
+        fprintf(stderr, RED"\n\t\t✖ Error opening records file!\n"RESET);
         return;
     }
 
-    printf("\t╔═════════╦═══════════════════╦═══════════════╦═══════════════╦═══════════════╦═══════════╗\n");
+    printf(BG_YELLOW BLUE"\t╔═════════╦═══════════════════╦═══════════════╦═══════════════╦═══════════════╦═══════════╗\n");
     printf("\t║ Acc No. ║      Name         ║    Country    ║     Phone     ║    Balance    ║   Type    ║\n");
-    printf("\t╠═════════╬═══════════════════╬═══════════════╬═══════════════╬═══════════════╬═══════════╣\n");
+    printf("\t╠═════════╬═══════════════════╬═══════════════╬═══════════════╬═══════════════╬═══════════╣\n"RESET);
 
     char line[256];
     while (fgets(line, sizeof(line), pf))
@@ -1100,7 +1002,7 @@ void checkAllAccounts(struct User u)
         
         if (result == 9 && strcmp(r.name, u.name) == 0)
         {
-            printf("\t║ %-7d ║ %-17s ║ %-13s ║ %-13s ║ $%-12.2f ║ %-9s ║\n",
+            printf(BG_YELLOW BLUE"\t║ %-7d ║ %-17s ║ %-13s ║ %-13s ║ $%-12.2f ║ %-9s ║\n"RESET,
                    r.accountNbr, r.name, r.country, r.phone, r.amount, r.accountType);
             found = 1;
         }
@@ -1108,18 +1010,18 @@ void checkAllAccounts(struct User u)
 
     if (found)
     {
-        printf("\t╚═════════╩═══════════════════╩═══════════════╩═══════════════╩═══════════════╩═══════════╝\n");
+        printf(BG_YELLOW BLUE"\t╚═════════╩═══════════════════╩═══════════════╩═══════════════╩═══════════════╩═══════════╝\n"RESET);
     }
     else
     {
-        printf("\t╚═════════╩═══════════════════╩═══════════════╩═══════════════╩═══════════════╩═══════════╝\n");
-        printf("\n\t\t✖ No accounts found for user %s.\n", u.name);
+        printf(BG_YELLOW BLUE"\t╚═════════╩═══════════════════╩═══════════════╩═══════════════╩═══════════════╩═══════════╝\n"RESET);
+        printf(RED"\n\t\t✖ No accounts found for user %s.\n"RESET, u.name);
     }
 
-    printf("\n\n\t\t╔══════════════════════════════════════════════════════════╗");
+    printf(BG_YELLOW RED"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
     printf("\n\t\t║  [1] Return to main menu          [2] Exit               ║");
-    printf("\n\t\t╚══════════════════════════════════════════════════════════╝");
-    printf("\n\n\t\tEnter your choice: ");
+    printf("\n\t\t╚══════════════════════════════════════════════════════════╝"RESET);
+    printf(BG_YELLOW BLUE"\n\n\t\tEnter your choice: "RESET);
     
     int choice;
     scanf("%d", &choice);
@@ -1136,7 +1038,7 @@ void checkAllAccounts(struct User u)
 }
 
 /*Function to send notifications to the new owners account
-==============================================================*/
+=======================================================================================*/
 void checkNotifications(char *username) {
     FILE *notifFile = fopen(NOTIFICATIONS, "r");
     FILE *tempFile = fopen(TEMP_NOTIFICATIONS, "w");
@@ -1144,7 +1046,7 @@ void checkNotifications(char *username) {
 
     if (!notifFile || !tempFile) return;
 
-    printf("\n\t\t🔔 Notifications for %s:\n", username);
+    printf(BG_BLACK BYELLOW"\n\t\t🔔 Notifications for %s:\n", username);
     int hasNotification = 0;
 
     while (fgets(line, sizeof(line), notifFile)) {
@@ -1162,6 +1064,6 @@ void checkNotifications(char *username) {
     rename(TEMP_NOTIFICATIONS, NOTIFICATIONS);
 
     if (!hasNotification)
-        printf("\t\t(No new notifications)\n");
+        printf(YELLOW"\t\t(No new notifications)\n"RESET);
 }
 

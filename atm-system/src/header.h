@@ -16,7 +16,7 @@ extern const char *USERS;
 // Structure to represent each account record
 struct Record
 {
-    int accountNbr
+    int accountNbr;
     int id;
     char name[MAX_NAME_LENGTH];
     int userId;
@@ -24,7 +24,7 @@ struct Record
     char country[MAX_NAME_LENGTH];
     char phone[MAX_PHONE_LENGTH];
     double amount;
-    char accountType[10]
+    char accountType[10];
 };
 
 // Structure to represent a user
@@ -58,5 +58,6 @@ void selectAccountType(char *accountType);
 int getNextAccountNumber(const char *filename);
 void checkNotifications(char *username);
 char* hashPassword(const char* password, char *hashedPassword);
+int isValidUsername(const char *username);
 
 #endif
