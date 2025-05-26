@@ -613,7 +613,7 @@ void removeAccount(struct User u)
 
     if (found)
     {
-        if (remove(RECORDS) == 0 && rename("temp.txt", RECORDS) == 0)
+        if (remove(RECORDS) == 0 && rename("data/temp.txt", RECORDS) == 0)
         {
             system("clear");
             printf(BG_YELLOW BLUE"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
@@ -845,7 +845,7 @@ void transferAccountOwnership(struct User u)
     fclose(tempFile);
     fclose(userFile);
 
-    if (remove(RECORDS) == 0 && rename("temp.txt", RECORDS) == 0) {
+    if (remove(RECORDS) == 0 && rename("data/temp.txt", RECORDS) == 0) {
         system("clear");
         printf(BG_YELLOW BLUE"\n\n\t\t╔══════════════════════════════════════════════════════════╗");
         printf("\n\t\t║              Transfer Completed Successfully             ║");
@@ -853,7 +853,7 @@ void transferAccountOwnership(struct User u)
         printf(BG_WHITE BGREEN"\n\t\t✔ Account #%d has been transferred to %s.\n"RESET, accountNumber, newOwner.name);
         
         time_t now = time(NULL);                    
-        struct tm *t = localtime(&now);             
+        struct tm *t = localtime(&now);
 
         char timestamp[64];
         strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", t);
