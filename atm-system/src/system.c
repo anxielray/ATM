@@ -129,42 +129,6 @@ void updateAccountInfo(struct User u)
             printf(BBLUE"\n\t\tAccount Type: %s"YELLOW, records[i].accountType);
             printf(BBLUE"\n\t\tBalance: $%.2f"YELLOW, records[i].amount);
             printf(BBLUE"\n\t\tCreation Date: %s"YELLOW, records[i].date);
-
-            double interestRate = 0.0;
-            int tenureYears = 0;
-            if (strcmp(records[i].accountType, "savings") == 0) {
-                interestRate = 0.07;
-                tenureYears = 1; 
-            } else if (strcmp(records[i].accountType, "fixed01") == 0) {
-                interestRate = 0.04;
-                tenureYears = 1;
-            } else if (strcmp(records[i].accountType, "fixed02") == 0) {
-                interestRate = 0.05;
-                tenureYears = 2;
-            } else if (strcmp(records[i].accountType, "fixed03") == 0) {
-                interestRate = 0.08;
-                tenureYears = 3;
-            }
-
-            if (interestRate > 0.0) {
-                double interest = records[i].amount * interestRate * tenureYears;
-                if (strcmp(records[i].accountType, "savings") == 0) {
-                    double monthlyInterest = interest / 12.0;
-                    char day[3];
-                    strncpy(day, records[i].date, 2);
-                    day[2] = '\0';
-                    printf(BG_WHITE BLUE"\n\n\t\tYou will get $%.2f as interest on day %s of every month", monthlyInterest, day);
-                } else {
-                    int day, month, year;
-                    sscanf(records[i].date, "%d/%d/%d", &day, &month, &year);
-                    year += tenureYears;
-                    printf(BG_WHITE BLUE"\n\n\t\tYou will get $%.2f as interest on %02d/%02d/%04d"RESET, interest, day, month, year);
-                }
-            } else if (strcmp(records[i].accountType, "current") == 0) {
-                printf(BG_WHITE BLUE"\n\n\t\tYou will not get interests because the account is of type current");
-            } else {
-                printf(RED"\n\n\t\tUnknown account type. Interest information not available."RESET);
-            }
             
             printf(BG_YELLOW BLUE"\n\t\tWhat would you like to update?\n"RESET);
             printf(BBLUE"\n\t\t[1] Country");
@@ -327,7 +291,43 @@ void checkAccountDetails(struct User u)
             printf(BBLUE"\tCountry: %s\n"YELLOW, r.country);
             printf(BBLUE"\tPhone Number: %s\n"YELLOW, r.phone);
             printf(BBLUE"\tCurrent Balance: $%.2f\n"YELLOW, r.amount);
-            printf(BBLUE"\t===========================\n\n"RESET);
+            printf(BBLUE"\t===========================\n"RESET);
+
+            double interestRate = 0.0;
+            int tenureYears = 0;
+            if (strcmp(r.accountType, "savings") == 0) {
+                interestRate = 0.07;
+                tenureYears = 1; 
+            } else if (strcmp(r.accountType, "fixed01") == 0) {
+                interestRate = 0.04;
+                tenureYears = 1;
+            } else if (strcmp(r.accountType, "fixed02") == 0) {
+                interestRate = 0.05;
+                tenureYears = 2;
+            } else if (strcmp(r.accountType, "fixed03") == 0) {
+                interestRate = 0.08;
+                tenureYears = 3;
+            }
+
+            if (interestRate > 0.0) {
+                double interest = r.amount * interestRate * tenureYears;
+                if (strcmp(r.accountType, "savings") == 0) {
+                    double monthlyInterest = interest / 12.0;
+                    char day[3];
+                    strncpy(day, r.date, 2);
+                    day[2] = '\0';
+                    printf(BG_WHITE BLUE"\n\tYou will get $%.2f as interest on day %s of every month\n\n", monthlyInterest, day);
+                } else {
+                    int day, month, year;
+                    sscanf(r.date, "%d/%d/%d", &day, &month, &year);
+                    year += tenureYears;
+                    printf(BG_WHITE BLUE"\n\tYou will get $%.2f as interest on %02d/%02d/%04d\n\n"RESET, interest, day, month, year);
+                }
+            } else if (strcmp(r.accountType, "current") == 0) {
+                printf(BG_WHITE BLUE"\n\tYou will not get interests because the account is of type current\n\n");
+            } else {
+                printf(RED"\n\tUnknown account type. Interest information not available."RESET);
+            }
             found = 1;
         }
     }
